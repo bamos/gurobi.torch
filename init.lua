@@ -11,7 +11,7 @@ void* /* GRBmodel* */ newmodel(void *env, const char *name, THDoubleTensor *obj,
                                THDoubleTensor *lb, THDoubleTensor *ub);
 void addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
                const char *sense, double rhs);
-int solve(THDoubleTensor *rx, void *model);
+int GTsolve(THDoubleTensor *rx, void *model);
 
 int getintattr(void *model, const char *name);
 ]]
@@ -93,7 +93,7 @@ end
 function M.solve(model)
    local nvars = clib.getintattr(model, "NumVars")
    local rx = torch.DoubleTensor(nvars)
-   local status = clib.solve(rx:cdata(), model)
+   local status = clib.GTsolve(rx:cdata(), model)
    return status, rx
 end
 

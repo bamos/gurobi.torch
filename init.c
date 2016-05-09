@@ -66,7 +66,7 @@ void addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
   assert(!error);
 }
 
-int solve(THDoubleTensor *rx, void *model) {
+int GTsolve(THDoubleTensor *rx, void *model) {
   GRBmodel *model_ = (GRBmodel*) model;
   int error = GRBoptimize(model);
   assert(!error);
