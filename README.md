@@ -15,9 +15,9 @@
   for unresolved issues.
   Contact [Brandon Amos](http://bamos.github.io) with any questions
   or issues.
-+ You may also be interested in a Torch
-  [ECOS](https://github.com/embotech/ecos) wrapper:
-  [bamos/ecos.torch](https://github.com/bamos/ecos.torch)
++ You may also be interested in Torch
+  [ECOS](https://github.com/embotech/ecos) bindings at
+  [bamos/ecos.torch](https://github.com/bamos/ecos.torch).
 
 # Installation
 
