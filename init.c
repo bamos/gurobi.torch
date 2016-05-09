@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <string.h>
 
-void* /* GRBenv* */ loadenv(const char* logfilename, int outputFlag) {
+void* /* GRBenv* */ GT_loadenv(const char* logfilename, int outputFlag) {
   GRBenv *env = (GRBenv*) malloc(sizeof(GRBenv*));
   int error = GRBloadenv(&env, logfilename);
   assert(!error);
@@ -18,7 +18,7 @@ void* /* GRBenv* */ loadenv(const char* logfilename, int outputFlag) {
   return env;
 }
 
-void* /* GRBmodel* */ newmodel(void *env, const char *name, THDoubleTensor *obj,
+void* /* GRBmodel* */ GT_newmodel(void *env, const char *name, THDoubleTensor *obj,
                                THDoubleTensor *lb, THDoubleTensor *ub) {
   GRBmodel *model = (GRBmodel*) malloc(sizeof(GRBmodel*));
   int nVars = THDoubleTensor_size(obj, 0);
@@ -36,7 +36,7 @@ void* /* GRBmodel* */ newmodel(void *env, const char *name, THDoubleTensor *obj,
   return model;
 }
 
-int getintattr(void *model, const char *name) {
+int GT_getintattr(void *model, const char *name) {
   GRBmodel *model_ = (GRBmodel*) model;
   int attr;
   int error = GRBgetintattr(model, name, &attr);
@@ -44,7 +44,7 @@ int getintattr(void *model, const char *name) {
   return attr;
 }
 
-void addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
+void GT_addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
                const char *sense, double rhs) {
   GRBmodel *model_ = (GRBmodel*) model;
   int* cind_ = THIntTensor_data(cind);
@@ -66,12 +66,12 @@ void addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
   assert(!error);
 }
 
-int GTsolve(THDoubleTensor *rx, void *model) {
+int GT_solve(THDoubleTensor *rx, void *model) {
   GRBmodel *model_ = (GRBmodel*) model;
   int error = GRBoptimize(model);
   assert(!error);
 
-  int status = getintattr(model, "Status");
+  int status = GT_getintattr(model, "Status");
   int nVars = THDoubleTensor_size(rx, 0);
 
   int *idx = (int*) malloc(nVars * sizeof(int));

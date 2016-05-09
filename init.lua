@@ -6,14 +6,14 @@ local M = {}
 local ffi = require 'ffi'
 ffi.load("/home/bamos/src/gurobi650/linux64/lib/libgurobi65.so", true)
 ffi.cdef [[
-void* /* GRBenv* */ loadenv(const char *logfilename, int outputFlag);
-void* /* GRBmodel* */ newmodel(void *env, const char *name, THDoubleTensor *obj,
-                               THDoubleTensor *lb, THDoubleTensor *ub);
-void addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
+void* /* GRBenv* */ GT_loadenv(const char *logfilename, int outputFlag);
+void* /* GRBmodel* */ GT_newmodel(void *env, const char *name, THDoubleTensor *obj,
+                                  THDoubleTensor *lb, THDoubleTensor *ub);
+void GT_addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
                const char *sense, double rhs);
-int GTsolve(THDoubleTensor *rx, void *model);
+int GT_solve(THDoubleTensor *rx, void *model);
 
-int getintattr(void *model, const char *name);
+int GT_getintattr(void *model, const char *name);
 ]]
 
 local clib = ffi.load(package.searchpath('libgurobi', package.cpath))
@@ -25,7 +25,7 @@ local loadenvCheck = argcheck{
 }
 function M.loadenv(...)
    local args = loadenvCheck(...)
-   return clib.loadenv(args.logfilename, args.outputFlag)
+   return clib.GT_loadenv(args.logfilename, args.outputFlag)
 end
 
 local newmodelCheck = argcheck{
@@ -47,7 +47,7 @@ function M.newmodel(...)
 
    if args.ub then ub_ = args.ub:cdata() end
 
-   return clib.newmodel(args.env, args.name, obj_:cdata(), lb_:cdata(), ub_)
+   return clib.GT_newmodel(args.env, args.name, obj_:cdata(), lb_:cdata(), ub_)
 end
 
 local addconstrCheck = argcheck{
@@ -67,7 +67,7 @@ function M.addconstr(...)
    local cind = lhs:nonzero():int()-1
    local cval = lhs[torch.ne(lhs, 0.0)]
    local nnz = cind:nElement()
-   clib.addconstr(model, nnz, cind:cdata(), cval:cdata(), sense, rhs)
+   clib.GT_addconstr(model, nnz, cind:cdata(), cval:cdata(), sense, rhs)
 end
 
 local addconstrsCheck = argcheck{
@@ -91,9 +91,9 @@ function M.addconstrs(...)
 end
 
 function M.solve(model)
-   local nvars = clib.getintattr(model, "NumVars")
+   local nvars = clib.GT_getintattr(model, "NumVars")
    local rx = torch.DoubleTensor(nvars)
-   local status = clib.GTsolve(rx:cdata(), model)
+   local status = clib.GT_solve(rx:cdata(), model)
    return status, rx
 end
 
