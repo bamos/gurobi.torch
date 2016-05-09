@@ -1,9 +1,8 @@
 language: Lua
 install:
-  - pip install flake8 pep257
   - sudo apt-get update -qq
-  - sudo apt-get install -y luarocks wget
+  - sudo apt-get install -y luarocks
   - sudo luarocks install luacheck
 
 script:
-  - luacheck . --no-global --no-self
+  - luacheck .
