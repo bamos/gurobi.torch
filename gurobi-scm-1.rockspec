@@ -2,7 +2,7 @@ package = "gurobi"
 version = "scm-1"
 
 source = {
-   url = "gitrec://github.com/bamos/gurobi.torch",
+   url = "git://github.com/bamos/gurobi.torch",
    tag = "master"
 }
 
@@ -16,7 +16,6 @@ description = {
 
 dependencies = {
    "argcheck",
-   "luarocks-fetch-gitrec",
    "luaffi",
    "torch >= 7.0"
 }
