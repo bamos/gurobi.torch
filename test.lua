@@ -27,8 +27,6 @@ function gurobiTest.SmallLP()
 end
 
 function gurobiTest.SmallLP_Incremental()
-   local env = gurobi.loadenv("")
-
    -- minimize y
    -- subject to y >= x
    --            y >= -x
