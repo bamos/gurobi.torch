@@ -18,11 +18,19 @@ void* /* GRBenv* */ loadenv(const char* logfilename, int outputFlag) {
   return env;
 }
 
-void* /* GRBmodel* */ newmodel(void* env, const char* name, THDoubleTensor *obj) {
+void* /* GRBmodel* */ newmodel(void *env, const char *name, THDoubleTensor *obj,
+                               THDoubleTensor *lb, THDoubleTensor *ub) {
   GRBmodel *model = (GRBmodel*) malloc(sizeof(GRBmodel*));
   int nVars = THDoubleTensor_size(obj, 0);
   double *obj_ = THDoubleTensor_data(obj);
-  int error = GRBnewmodel(env, &model, name, nVars, obj_, 0, 0, 0, 0);
+  double *lb_ = THDoubleTensor_data(lb);
+
+  double *ub_ = 0;
+  if (ub) {
+    ub_ = THDoubleTensor_data(ub);
+  }
+
+  int error = GRBnewmodel(env, &model, name, nVars, obj_, lb_, ub_, 0, 0);
   assert(!error);
 
   return model;

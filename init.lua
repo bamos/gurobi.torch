@@ -7,7 +7,8 @@ local ffi = require 'ffi'
 ffi.load("/home/bamos/src/gurobi650/linux64/lib/libgurobi65.so", true)
 ffi.cdef [[
 void* /* GRBenv* */ loadenv(const char *logfilename, int outputFlag);
-void* /* GRBmodel* */ newmodel(void *env, const char *name, THDoubleTensor *obj);
+void* /* GRBmodel* */ newmodel(void *env, const char *name, THDoubleTensor *obj,
+                               THDoubleTensor *lb, THDoubleTensor *ub);
 void addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
                const char *sense, double rhs);
 int solve(THDoubleTensor *rx, void *model);
@@ -31,12 +32,22 @@ local newmodelCheck = argcheck{
    pack=true,
    {name='env', type='cdata'},
    {name='name', type='string'},
-   {name='obj', type='torch.*Tensor'}
+   {name='obj', type='torch.*Tensor'},
+   {name='lb', type='torch.*Tensor', opt=true},
+   {name='ub', type='torch.*Tensor', opt=true}
 }
 function M.newmodel(...)
    local args = newmodelCheck(...)
    local obj_ = args.obj:double()
-   return clib.newmodel(args.env, args.name, obj_:cdata())
+
+   local lb_, ub_
+
+   if args.lb then lb_ = args.lb
+   else lb_ = torch.DoubleTensor():resizeAs(obj_):fill(-1e99) end
+
+   if args.ub then ub_ = args.ub:cdata() end
+
+   return clib.newmodel(args.env, args.name, obj_:cdata(), lb_:cdata(), ub_)
 end
 
 local addconstrCheck = argcheck{
