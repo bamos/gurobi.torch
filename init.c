@@ -7,7 +7,7 @@
 #include <string.h>
 
 void* /* GRBenv* */ GT_loadenv(const char* logfilename, int outputFlag) {
-  GRBenv *env = (GRBenv*) malloc(sizeof(GRBenv*));
+  GRBenv *env;
   int error = GRBloadenv(&env, logfilename);
   assert(!error);
 
@@ -20,7 +20,7 @@ void* /* GRBenv* */ GT_loadenv(const char* logfilename, int outputFlag) {
 
 void* /* GRBmodel* */ GT_newmodel(void *env, const char *name, THDoubleTensor *obj,
                                THDoubleTensor *lb, THDoubleTensor *ub) {
-  GRBmodel *model = (GRBmodel*) malloc(sizeof(GRBmodel*));
+  GRBmodel *model;
   int nVars = THDoubleTensor_size(obj, 0);
   double *obj_ = THDoubleTensor_data(obj);
   double *lb_ = THDoubleTensor_data(lb);
@@ -84,4 +84,15 @@ int GT_solve(THDoubleTensor *rx, void *model) {
   assert(!error);
 
   return status;
+}
+
+void GT_free(void *env, void *model) {
+  int error;
+  if (model) {
+    error = GRBfreemodel((GRBmodel*) model);
+    assert(!error);
+  }
+  if (env) {
+    GRBfreeenv((GRBenv*) env);
+  }
 }

@@ -24,6 +24,8 @@ function gurobiTest.SmallLP()
    local optX = torch.Tensor{0.5, 1.5}
    tester:asserteq(status, 2, 'Non-optimal status: ' .. status)
    tester:assertTensorEq(x, optX, eps, 'Invalid optimal value.')
+
+   gurobi.free(env, model)
 end
 
 function gurobiTest.SmallLP_Incremental()
@@ -51,6 +53,8 @@ function gurobiTest.SmallLP_Incremental()
    optX = torch.Tensor{-0.5, 0.5}
    tester:asserteq(status, 2, 'Non-optimal status: ' .. status)
    tester:assertTensorEq(x, optX, eps, 'Invalid optimal value.')
+
+   gurobi.free(env, model)
 end
 
 tester:add(gurobiTest)

@@ -14,6 +14,7 @@ void GT_addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
 int GT_solve(THDoubleTensor *rx, void *model);
 
 int GT_getintattr(void *model, const char *name);
+int GT_free(void *env, void *model);
 ]]
 
 local clib = ffi.load(package.searchpath('libgurobi', package.cpath))
@@ -95,6 +96,10 @@ function M.solve(model)
    local rx = torch.DoubleTensor(nvars)
    local status = clib.GT_solve(rx:cdata(), model)
    return status, rx
+end
+
+function M.free(env, model)
+   clib.GT_free(env, model)
 end
 
 return M

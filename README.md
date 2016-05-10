@@ -46,6 +46,8 @@ local model = gurobi.newmodel(env, "", c)
 gurobi.addconstrs(model, G, 'LE', h)
 local status, x = gurobi.solve(model)
 print(x) -- Optimal x is [0.5, 1.5]
+
+gurobi.free(env, model)
 ```
 
 ## Linear Program with Incrementally Added Constraints
@@ -72,6 +74,8 @@ print(x) -- Optimal at this point is [0, 0]
 gurobi.addconstr(model, G[3], 'LE', h[3])
 status, x = gurobi.solve(model)
 print(x) -- Optimal at this point is [-0.5, 0.5]
+
+gurobi.free(env, model)
 ```
 
 # Tests
