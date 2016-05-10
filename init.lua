@@ -6,24 +6,27 @@ local M = {}
 local ffi = require 'ffi'
 ffi.load("/home/bamos/src/gurobi650/linux64/lib/libgurobi65.so", true)
 ffi.cdef [[
-void* /* GRBenv* */ GT_loadenv(const char *logfilename, int outputFlag);
-void* /* GRBmodel* */ GT_newmodel(void *env, const char *name, THDoubleTensor *obj,
+typedef void GRBenv;
+typedef void GRBmodel;
+
+GRBenv* GT_loadenv(const char *logfilename, int outputFlag);
+GRBmodel* GT_newmodel(GRBenv *env, const char *name, THDoubleTensor *obj,
                                   THDoubleTensor *lb, THDoubleTensor *ub);
 
-void GT_addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
+void GT_addconstr(GRBmodel *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
                const char *sense, double rhs);
 
-void GT_addqpterms(void *model, int numqnz, THIntTensor *qrow, THIntTensor *qcol,
+void GT_addqpterms(GRBmodel *model, int numqnz, THIntTensor *qrow, THIntTensor *qcol,
                    THDoubleTensor *qval);
-void GT_delq(void *model);
+void GT_delq(GRBmodel *model);
 
 int GT_solve(THDoubleTensor *rx, void *model);
 
-int GT_setdblattrlist(void *model, const char *name, int len, THIntTensor *ind,
-                      THDoubleTensor *values);
-int GT_getintattr(void *model, const char *name);
+void GT_setdblattrlist(GRBmodel *model, const char *name, int len, THIntTensor *ind,
+                       THDoubleTensor *values);
+int GT_getintattr(GRBmodel *model, const char *name);
 
-int GT_free(void *env, void *model);
+int GT_free(GRBenv *env, GRBmodel *model);
 ]]
 
 local clib = ffi.load(package.searchpath('libgurobi', package.cpath))

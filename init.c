@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <string.h>
 
-void* /* GRBenv* */ GT_loadenv(const char* logfilename, int outputFlag) {
+GRBenv* GT_loadenv(const char* logfilename, int outputFlag) {
   GRBenv *env;
   int error = GRBloadenv(&env, logfilename);
   assert(!error);
@@ -18,8 +18,8 @@ void* /* GRBenv* */ GT_loadenv(const char* logfilename, int outputFlag) {
   return env;
 }
 
-void* /* GRBmodel* */ GT_newmodel(void *env, const char *name, THDoubleTensor *obj,
-                               THDoubleTensor *lb, THDoubleTensor *ub) {
+GRBmodel* GT_newmodel(GRBenv *env, const char *name, THDoubleTensor *obj,
+                      THDoubleTensor *lb, THDoubleTensor *ub) {
   GRBmodel *model;
   int nVars = THDoubleTensor_size(obj, 0);
   double *obj_ = THDoubleTensor_data(obj);
@@ -36,25 +36,23 @@ void* /* GRBmodel* */ GT_newmodel(void *env, const char *name, THDoubleTensor *o
   return model;
 }
 
-int GT_setdblattrlist(void *model, const char *name, int len, THIntTensor *ind,
-                      THDoubleTensor *values) {
+void GT_setdblattrlist(GRBmodel *model, const char *name, int len, THIntTensor *ind,
+                       THDoubleTensor *values) {
   int *ind_ = THIntTensor_data(ind);
   double *values_ = THDoubleTensor_data(values);
   int error = GRBsetdblattrlist(model, name, len, ind_, values_);
   assert(!error);
 }
 
-int GT_getintattr(void *model, const char *name) {
-  GRBmodel *model_ = (GRBmodel*) model;
+int GT_getintattr(GRBmodel *model, const char *name) {
   int attr;
   int error = GRBgetintattr(model, name, &attr);
   assert(!error);
   return attr;
 }
 
-void GT_addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
+void GT_addconstr(GRBmodel *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
                   const char *sense, double rhs) {
-  GRBmodel *model_ = (GRBmodel*) model;
   int* cind_ = THIntTensor_data(cind);
   double* cval_ = THDoubleTensor_data(cval);
 
@@ -70,11 +68,11 @@ void GT_addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
     assert(0);
   }
 
-  int error = GRBaddconstr(model_, nnz, cind_, cval_, sense_, rhs, 0);
+  int error = GRBaddconstr(model, nnz, cind_, cval_, sense_, rhs, 0);
   assert(!error);
 }
 
-void GT_addqpterms(void *model, int numqnz, THIntTensor *qrow, THIntTensor *qcol,
+void GT_addqpterms(GRBmodel *model, int numqnz, THIntTensor *qrow, THIntTensor *qcol,
                    THDoubleTensor *qval) {
   int *qrow_ = THIntTensor_data(qrow);
   int *qcol_ = THIntTensor_data(qcol);
@@ -83,13 +81,12 @@ void GT_addqpterms(void *model, int numqnz, THIntTensor *qrow, THIntTensor *qcol
   assert(!error);
 }
 
-void GT_delq(void *model) {
-  int error = GRBdelq((GRBmodel*) model);
+void GT_delq(GRBmodel *model) {
+  int error = GRBdelq(model);
   assert(!error);
 }
 
-int GT_solve(THDoubleTensor *rx, void *model) {
-  GRBmodel *model_ = (GRBmodel*) model;
+int GT_solve(THDoubleTensor *rx, GRBmodel *model) {
   int error = GRBoptimize(model);
   assert(!error);
 
@@ -108,13 +105,13 @@ int GT_solve(THDoubleTensor *rx, void *model) {
   return status;
 }
 
-void GT_free(void *env, void *model) {
+void GT_free(GRBenv *env, GRBmodel *model) {
   int error;
   if (model) {
-    error = GRBfreemodel((GRBmodel*) model);
+    error = GRBfreemodel(model);
     assert(!error);
   }
   if (env) {
-    GRBfreeenv((GRBenv*) env);
+    GRBfreeenv(env);
   }
 }
