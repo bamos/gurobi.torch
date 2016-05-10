@@ -74,5 +74,34 @@ function gurobiTest.SmallQP()
    gurobi.free(env, model)
 end
 
+function gurobiTest.ChangeObj()
+   local env = gurobi.loadenv("")
+   local c = torch.Tensor{0.0, 1.0}
+   local lb = torch.Tensor{0.0, 0.0}
+   local ub = torch.Tensor{3.0, 3.0}
+   local model = gurobi.newmodel(env, "", c, lb, ub)
+
+   local A = torch.Tensor{1.0, -1.0}
+   gurobi.addconstr(model, A, 'EQ', 0.0)
+
+   local status, x = gurobi.solve(model)
+
+   local optX = torch.Tensor{0.0, 0.0}
+   tester:asserteq(status, 2, 'Non-optimal status: ' .. status)
+   tester:assertTensorEq(x, optX, eps, 'Invalid optimal value.')
+
+
+   local newC = torch.Tensor{0.0, -1.0}
+   gurobi.updateObj(model, newC)
+
+   status, x = gurobi.solve(model)
+
+   local optX = torch.Tensor{3.0, 3.0}
+   tester:asserteq(status, 2, 'Non-optimal status: ' .. status)
+   tester:assertTensorEq(x, optX, eps, 'Invalid optimal value.')
+
+   gurobi.free(env, model)
+end
+
 tester:add(gurobiTest)
 tester:run()

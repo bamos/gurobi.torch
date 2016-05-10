@@ -19,7 +19,10 @@ void GT_delq(void *model);
 
 int GT_solve(THDoubleTensor *rx, void *model);
 
+int GT_setdblattrlist(void *model, const char *name, int len, THIntTensor *ind,
+                      THDoubleTensor *values);
 int GT_getintattr(void *model, const char *name);
+
 int GT_free(void *env, void *model);
 ]]
 
@@ -130,6 +133,17 @@ function M.solve(model)
    local rx = torch.DoubleTensor(nvars)
    local status = clib.GT_solve(rx:cdata(), model)
    return status, rx
+end
+
+function M.updateObj(model, obj)
+   M.setdblattrlist(model, "Obj", obj)
+end
+
+function M.setdblattrlist(model, name, x)
+   local ind = x:nonzero():int()-1
+   local val = x[torch.ne(x, 0.0)]
+   local nnz = ind:nElement()
+   clib.GT_setdblattrlist(model, name, nnz, ind:cdata(), val:cdata())
 end
 
 function M.free(env, model)

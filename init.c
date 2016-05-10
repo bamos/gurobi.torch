@@ -36,6 +36,14 @@ void* /* GRBmodel* */ GT_newmodel(void *env, const char *name, THDoubleTensor *o
   return model;
 }
 
+int GT_setdblattrlist(void *model, const char *name, int len, THIntTensor *ind,
+                      THDoubleTensor *values) {
+  int *ind_ = THIntTensor_data(ind);
+  double *values_ = THDoubleTensor_data(values);
+  int error = GRBsetdblattrlist(model, name, len, ind_, values_);
+  assert(!error);
+}
+
 int GT_getintattr(void *model, const char *name) {
   GRBmodel *model_ = (GRBmodel*) model;
   int attr;
