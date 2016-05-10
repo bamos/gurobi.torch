@@ -96,7 +96,7 @@ function gurobiTest.ChangeObj()
 
    status, x = gurobi.solve(model)
 
-   local optX = torch.Tensor{3.0, 3.0}
+   optX = torch.Tensor{3.0, 3.0}
    tester:asserteq(status, 2, 'Non-optimal status: ' .. status)
    tester:assertTensorEq(x, optX, eps, 'Invalid optimal value.')
 
