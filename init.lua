@@ -9,8 +9,14 @@ ffi.cdef [[
 void* /* GRBenv* */ GT_loadenv(const char *logfilename, int outputFlag);
 void* /* GRBmodel* */ GT_newmodel(void *env, const char *name, THDoubleTensor *obj,
                                   THDoubleTensor *lb, THDoubleTensor *ub);
+
 void GT_addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
                const char *sense, double rhs);
+
+void GT_addqpterms(void *model, int numqnz, THIntTensor *qrow, THIntTensor *qcol,
+                   THDoubleTensor *qval);
+void GT_delq(void *model);
+
 int GT_solve(THDoubleTensor *rx, void *model);
 
 int GT_getintattr(void *model, const char *name);
@@ -89,6 +95,34 @@ function M.addconstrs(...)
    for i = 1, nConstr do
       M.addconstr(model, lhs[i], sense, rhs[i])
    end
+end
+
+local addqptermsCheck = argcheck{
+   pack=true,
+   {name='model', type='cdata'},
+   {name='Q', type='torch.*Tensor'},
+}
+function M.addqpterms(...)
+   local args = addqptermsCheck(...)
+   local model = args.model
+   local Q = args.Q
+
+   local nz = Q:nonzero():int():split(1, 2)
+   local qrow = nz[1]:clone():view(-1)
+   local qcol = nz[2]:clone():view(-1)
+   local numqnz = qrow:nElement()
+   local qval = torch.DoubleTensor(numqnz)
+   for i = 1, numqnz do
+      qval[i] = Q[qrow[i]][qcol[i]]
+   end
+   qrow:csub(1.0)
+   qcol:csub(1.0)
+
+   clib.GT_addqpterms(model, numqnz, qrow:cdata(), qcol:cdata(), qval:cdata())
+end
+
+function M.delq(model)
+   clib.GT_delq(model)
 end
 
 function M.solve(model)

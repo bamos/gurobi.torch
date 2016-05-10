@@ -57,5 +57,22 @@ function gurobiTest.SmallLP_Incremental()
    gurobi.free(env, model)
 end
 
+function gurobiTest.SmallQP()
+   local env = gurobi.loadenv("")
+   local c = torch.Tensor{2.0, 1.0}
+   local model = gurobi.newmodel(env, "", c)
+
+   local Q = torch.eye(2)
+   gurobi.addqpterms(model, Q)
+
+   local status, x = gurobi.solve(model)
+
+   local optX = torch.Tensor{-1.0, -0.5}
+   tester:asserteq(status, 2, 'Non-optimal status: ' .. status)
+   tester:assertTensorEq(x, optX, eps, 'Invalid optimal value.')
+
+   gurobi.free(env, model)
+end
+
 tester:add(gurobiTest)
 tester:run()

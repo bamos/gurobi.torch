@@ -45,7 +45,7 @@ int GT_getintattr(void *model, const char *name) {
 }
 
 void GT_addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
-               const char *sense, double rhs) {
+                  const char *sense, double rhs) {
   GRBmodel *model_ = (GRBmodel*) model;
   int* cind_ = THIntTensor_data(cind);
   double* cval_ = THDoubleTensor_data(cval);
@@ -63,6 +63,20 @@ void GT_addconstr(void *model, int nnz, THIntTensor *cind, THDoubleTensor *cval,
   }
 
   int error = GRBaddconstr(model_, nnz, cind_, cval_, sense_, rhs, 0);
+  assert(!error);
+}
+
+void GT_addqpterms(void *model, int numqnz, THIntTensor *qrow, THIntTensor *qcol,
+                   THDoubleTensor *qval) {
+  int *qrow_ = THIntTensor_data(qrow);
+  int *qcol_ = THIntTensor_data(qcol);
+  double *qval_ = THDoubleTensor_data(qval);
+  int error = GRBaddqpterms(model, numqnz, qrow_, qcol_, qval_);
+  assert(!error);
+}
+
+void GT_delq(void *model) {
+  int error = GRBdelq((GRBmodel*) model);
   assert(!error);
 }
 
