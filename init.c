@@ -106,6 +106,31 @@ int GT_solve(THDoubleTensor *rx, GRBmodel *model) {
   return status;
 }
 
+void GT_solvePar(THDoubleTensor *rx, THIntTensor *status, GRBmodel **models,
+                 int nVars, int nModels) {
+  int *idx = (int*) malloc(nVars * sizeof(int));
+  for (int i = 0; i < nVars; i++) {
+    idx[i] = i;
+  }
+
+  double *rx_ = THDoubleTensor_data(rx);
+  int *status_ = THIntTensor_data(status);
+
+#pragma omp parallel for default(shared)
+  for (int i = 0; i < nModels; i++) {
+    GRBmodel* model = models[i];
+    int error = GRBoptimize(model);
+    assert(!error);
+    int status = GT_getintattr(model, "Status");
+    status_[i] = status;
+
+    error = GRBgetdblattrlist(model, "X", nVars, idx, rx_ + i*nVars);
+    assert(!error);
+  }
+
+  free(idx);
+}
+
 void GT_free(GRBenv *env, GRBmodel *model) {
   int error;
   if (model) {

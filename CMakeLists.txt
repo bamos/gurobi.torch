@@ -8,7 +8,7 @@ FIND_PACKAGE(Torch REQUIRED)
 
 include(cmake/USE_C99.cmake)
 USE_C99()
-set (CMAKE_C_FLAGS "-Wall -Wno-unused-variable ${CMAKE_C_FLAGS}")
+set (CMAKE_C_FLAGS "-Wall -Wno-unused-variable -fopenmp ${CMAKE_C_FLAGS}")
 
 set (GUROBI_HOME "$ENV{HOME}/src/gurobi650/linux64")
 

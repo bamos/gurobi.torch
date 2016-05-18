@@ -78,6 +78,18 @@ print(x) -- Optimal at this point is [-0.5, 0.5]
 gurobi.free(env, model)
 ```
 
+## OpenMP Parallel Solves
+```lua
+local env = gurobi.loadenv("")
+local model1 = gurobi.newmodel(env, "", c)
+gurobi.addconstrs(model1, G, 'LE', h)
+
+local model2 = gurobi.newmodel(env, "", c)
+gurobi.addconstrs(model2, G, 'LE', h)
+
+local status, xs = gurobi.solvePar({model1, model2})
+```
+
 # Tests
 
 After installing the library with `luarocks`, our tests in

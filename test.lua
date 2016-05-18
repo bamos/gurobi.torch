@@ -103,5 +103,31 @@ function gurobiTest.ChangeObj()
    gurobi.free(env, model)
 end
 
+function gurobiTest.par()
+   local c = torch.Tensor{2.0, 1.0}
+   local G = torch.Tensor{{-1, 1}, {-1, -1}, {0, -1}, {1, -2}}
+   local h = torch.Tensor{1.0, -2.0, 0.0, 4.0}
+
+   local env = gurobi.loadenv("")
+   local model1 = gurobi.newmodel(env, "", c)
+   gurobi.addconstrs(model1, G, 'LE', h)
+
+   local model2 = gurobi.newmodel(env, "", c)
+   gurobi.addconstrs(model2, G, 'LE', h)
+
+   local status, xs = gurobi.solvePar({model1, model2})
+
+   local optX = torch.Tensor{0.5, 1.5}
+   for i = 1,2 do
+      local status_i = status[i]
+      local x = xs[i]
+      tester:asserteq(status_i, 2, 'Non-optimal status: ' .. status_i)
+      tester:assertTensorEq(x, optX, eps, 'Invalid optimal value.')
+   end
+
+   gurobi.free(nil, model1)
+   gurobi.free(env, model2)
+end
+
 tester:add(gurobiTest)
 tester:run()

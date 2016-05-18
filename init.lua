@@ -20,7 +20,9 @@ void GT_addqpterms(GRBmodel *model, int numqnz, THIntTensor *qrow, THIntTensor *
                    THDoubleTensor *qval);
 void GT_delq(GRBmodel *model);
 
-int GT_solve(THDoubleTensor *rx, void *model);
+int GT_solve(THDoubleTensor *rx, GRBmodel *model);
+void GT_solvePar(THDoubleTensor *rx, THIntTensor *status, GRBmodel **models,
+                 int nVars, int nModels);
 
 void GT_setdblattrlist(GRBmodel *model, const char *name, int len, THIntTensor *ind,
                        THDoubleTensor *values);
@@ -135,6 +137,16 @@ function M.solve(model)
    local nvars = clib.GT_getintattr(model, "NumVars")
    local rx = torch.DoubleTensor(nvars)
    local status = clib.GT_solve(rx:cdata(), model)
+   return status, rx
+end
+
+function M.solvePar(models)
+   local nvars = clib.GT_getintattr(models[1], "NumVars")
+   local nModels = table.getn(models)
+   local rx = torch.DoubleTensor(nModels, nvars)
+   local modelsFfi = ffi.new("GRBmodel *[2]", models)
+   local status = torch.IntTensor(nModels)
+   clib.GT_solvePar(rx:cdata(), status:cdata(), modelsFfi, nvars, nModels)
    return status, rx
 end
 
