@@ -101,6 +101,7 @@ int GT_solve(THDoubleTensor *rx, GRBmodel *model) {
   double *rx_ = THDoubleTensor_data(rx);
   error = GRBgetdblattrlist(model, "X", nVars, idx, rx_);
   assert(!error);
+  free(idx);
 
   return status;
 }
