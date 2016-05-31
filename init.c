@@ -125,7 +125,7 @@ void GT_solvePar(THDoubleTensor *rx, THIntTensor *status, GRBmodel **models,
     status_[i] = status;
 
     error = GRBgetdblattrlist(model, "X", nVars, idx, rx_ + i*nVars);
-    assert(!error);
+    /* assert(!error); */
   }
 
   free(idx);
