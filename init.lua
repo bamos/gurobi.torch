@@ -1,5 +1,6 @@
 local torch = require 'torch'
 local argcheck = require 'argcheck'
+local paths = require 'paths'
 
 local M = {}
 
