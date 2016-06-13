@@ -4,7 +4,12 @@ local argcheck = require 'argcheck'
 local M = {}
 
 local ffi = require 'ffi'
-ffi.load("/home/bamos/src/gurobi650/linux64/lib/libgurobi65.so", true)
+local ghome = os.getenv("GUROBI_HOME")
+if not ghome then
+   print("gurobi.torch: init.lua: Error: GUROBI_HOME environment variable not defined.")
+   os.exit(-1)
+end
+ffi.load(paths.concat(ghome, "lib", "libgurobi65.so"), true)
 ffi.cdef [[
 typedef void GRBenv;
 typedef void GRBmodel;

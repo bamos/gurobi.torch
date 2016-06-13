@@ -8,15 +8,18 @@ FIND_PACKAGE(Torch REQUIRED)
 
 include(cmake/USE_C99.cmake)
 USE_C99()
-set (CMAKE_C_FLAGS "-Wall -Wno-unused-variable -fopenmp ${CMAKE_C_FLAGS}")
-
-set (GUROBI_HOME "$ENV{HOME}/src/gurobi650/linux64")
+find_package(OpenMP)
+set (CMAKE_C_FLAGS "-Wall -Wno-unused-variable ${OpenMP_C_FLAGS} ${CMAKE_C_FLAGS}")
 
 FILE(GLOB luasrc *.lua)
 FILE(GLOB src *.c)
 
+if(NOT DEFINED ENV{GUROBI_HOME})
+  message(FATAL_ERROR "GUROBI_HOME environment variable not defined.")
+endif()
+
 INCLUDE_DIRECTORIES(
-  GLOB "${GUROBI_HOME}/include" *.h
+  GLOB "$ENV{GUROBI_HOME}/include" *.h
 )
 
 ADD_TORCH_PACKAGE(gurobi "${src}" "${luasrc}")
