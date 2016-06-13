@@ -21,7 +21,8 @@
 
 # Installation
 
-1. Update paths to your Gurobi installation in `CMakeLists.txt` and `init.c`.
+1. Set `GUROBI_HOME` in your shell's current session (with `export GUROBI_HOME=..`)
+   and initialization file (`.bashrc` or `.zshrc`).
 2. `luarocks make`
 
 # Usage
