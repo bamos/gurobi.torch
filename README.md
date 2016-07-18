@@ -10,14 +10,12 @@
 
 ---
 
-+ **Warning:** This package is unstable, unfinished, and under development.
-  Please see our [issue tracker](https://github.com/bamos/gurobi.torch/issues)
-  for unresolved issues.
-  Contact [Brandon Amos](http://bamos.github.io) with any questions
-  or issues.
-+ You may also be interested in Torch
-  [ECOS](https://github.com/embotech/ecos) bindings at
+You may also be interested in:
++ Torch [ECOS](https://github.com/embotech/ecos) bindings at
   [bamos/ecos.torch](https://github.com/bamos/ecos.torch).
++ A Torch library for convex optimization that implements
+  spectral projected gradient and projected gradient descent at
+  [bamos/cvx-optim.torch](https://github.com/bamos/cvx-optim.torch).
 
 # Installation
 
