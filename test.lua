@@ -5,6 +5,9 @@ torch.setdefaulttensortype('torch.DoubleTensor')
 
 local gurobi = require 'gurobi'
 
+collectgarbage()
+collectgarbage()
+
 local tester = torch.Tester()
 local gurobiTest = torch.TestSuite()
 
