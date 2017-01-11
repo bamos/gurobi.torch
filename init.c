@@ -93,15 +93,16 @@ int GT_solve(THDoubleTensor *rx, GRBmodel *model) {
   int status = GT_getintattr(model, "Status");
   int nVars = THDoubleTensor_size(rx, 0);
 
-  int *idx = (int*) malloc(nVars * sizeof(int));
-  for (int i = 0; i < nVars; i++) {
-    idx[i] = i;
+  if(status==2){
+    int *idx = (int*) malloc(nVars * sizeof(int));
+    for (int i = 0; i < nVars; i++) {
+      idx[i] = i;
+    }
+    double *rx_ = THDoubleTensor_data(rx);
+    error = GRBgetdblattrlist(model, "X", nVars, idx, rx_);
+    assert(!error);
+    free(idx);
   }
-
-  double *rx_ = THDoubleTensor_data(rx);
-  error = GRBgetdblattrlist(model, "X", nVars, idx, rx_);
-  assert(!error);
-  free(idx);
 
   return status;
 }
