@@ -10,7 +10,7 @@ if not ghome then
    print("gurobi.torch: init.lua: Error: GUROBI_HOME environment variable not defined.")
    os.exit(-1)
 end
-ffi.load(paths.concat(ghome, "lib", "libgurobi65.so"), true)
+M.gurobi_lib = ffi.load(paths.concat(ghome, "lib", "libgurobi65.so"), true)
 ffi.cdef [[
 typedef void GRBenv;
 typedef void GRBmodel;
